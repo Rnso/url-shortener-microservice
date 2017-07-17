@@ -3,6 +3,7 @@ import moment from 'moment'
 import { MongoClient, ObjectID } from 'mongodb'
 import assert from 'assert'
 import config from '../config'
+import urlRegex from 'url-regex'
 
 let mdb;
 MongoClient.connect(config.mongodbUri, (err, db) => {
@@ -14,8 +15,7 @@ const router = express.Router()
 router.get('/api/*', (req, res) => {
     let urlInfo = {}
     let shortUrl
-    let regEx = /^https?:\/\/(\S+\.)?(\S+\.)(\S+)\S*/
-    if (regEx.test(req.params[0])) {
+    if (urlRegex().test(req.params[0])) {
         urlInfo.inputUrl = req.params[0]
         urlInfo.shortUrl = req.headers.host + '/' + (Math.floor(Math.random() * 9000) + 1000).toString()
         urlInfo.createdDate = moment().format()
