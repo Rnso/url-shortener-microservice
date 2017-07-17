@@ -30,16 +30,22 @@ router.get('/api/*', (req, res) => {
         })
     }
     else {
-        res.send({ 'error': 'Invalid url' })
+        res.send({ 'error': 'Invalid url. Make sure that the site exist' })
     }
 
 })
 
 router.get('/:shortUrl', (req, res) => {
-    console.log(req.headers.host + '/' + req.params.shortUrl)
-    let url = req.headers.host + '/' + req.params.shortUrl
+    let url = req.headers['x-forwarded-proto'].split(',')[0] + '://' + req.headers.host + '/' + req.params.shortUrl
     mdb.collection('ShortURLs').findOne({ shortUrl: url }).then((sUrl) => {
+      console.log(sUrl)
+      let regex = /(https:\/\/)|(https:\/\/)/
+      if(regex.test(sUrl.inputUrl)){
         res.redirect(sUrl.inputUrl)
+      }
+      else{
+        res.redirect('http://' + sUrl.inputUrl)
+      }
     })
 })
 
